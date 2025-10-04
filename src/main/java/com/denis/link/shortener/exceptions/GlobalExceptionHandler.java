@@ -11,4 +11,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNotFound(LinkNaoEncontradoException ex) {
         return ResponseEntity.status(404).body(ex.getMessage());
     }
+
+    @ExceptionHandler(LinkJaExistenteException.class)
+    public ResponseEntity<String> handleConflict(LinkJaExistenteException ex) {
+        return ResponseEntity.status(409).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MinimoDeCaracteresNaoAlcancadoException.class)
+    public ResponseEntity<String> handleBadRequest(MinimoDeCaracteresNaoAlcancadoException ex) {
+        return ResponseEntity.status(400).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(CaracterInvalidoException.class)
+    public ResponseEntity<String> handleBadRequest(CaracterInvalidoException ex) {
+        return ResponseEntity.status(400).body(ex.getMessage());
+    }
 }

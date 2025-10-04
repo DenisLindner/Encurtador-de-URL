@@ -17,8 +17,8 @@ public class LinkCotroller {
     private final LinkService linkService;
 
     @PostMapping("/links")
-    public ResponseEntity<LinkResponse> postLink(@RequestBody @Valid LinkRequest linkRequest) {
-        return ResponseEntity.status(201).body(linkService.postLink(linkRequest));
+    public ResponseEntity<LinkResponse> postLink(@RequestBody @Valid LinkRequest linkRequest, @RequestParam(required = false) String customShortLink) {
+        return ResponseEntity.status(201).body(linkService.postLink(linkRequest, customShortLink));
     }
 
     @GetMapping("/{shortLink}")
@@ -26,8 +26,13 @@ public class LinkCotroller {
         return ResponseEntity.status(302).header("Location", linkService.getOriginalLink(shortLink)).build();
     }
 
-    @GetMapping("/links")
-    public ResponseEntity<List<LinkResponse>> getAllLinks() {
-        return ResponseEntity.status(200).body(linkService.getAllLinks());
+    @GetMapping("/links/count/all")
+    public ResponseEntity<Integer> getQtdAllLinksCreated() {
+        return ResponseEntity.status(200).body(linkService.getQtdAllLinksCreated());
+    }
+
+    @GetMapping("/links/count/today")
+    public ResponseEntity<Integer> getQtdLinksCreatedToday() {
+        return ResponseEntity.status(200).body(linkService.getQtdLinksCreatedToday());
     }
 }
