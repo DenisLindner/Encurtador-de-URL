@@ -26,4 +26,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleBadRequest(CaracterInvalidoException ex) {
         return ResponseEntity.status(400).body(ex.getMessage());
     }
+
+    @ExceptionHandler(LinkInvalidoException.class)
+    public ResponseEntity<String> handleBadRequest(LinkInvalidoException ex) {
+        return ResponseEntity.status(400).body(ex.getMessage());
+    }
 }

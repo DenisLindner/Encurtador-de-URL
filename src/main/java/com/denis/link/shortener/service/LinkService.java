@@ -1,27 +1,28 @@
 package com.denis.link.shortener.service;
 
-import com.denis.link.shortener.exceptions.CaracterInvalidoException;
-import com.denis.link.shortener.exceptions.LinkJaExistenteException;
-import com.denis.link.shortener.exceptions.LinkNaoEncontradoException;
-import com.denis.link.shortener.exceptions.MinimoDeCaracteresNaoAlcancadoException;
+import com.denis.link.shortener.exceptions.*;
 import com.denis.link.shortener.model.LinkEntity;
 import com.denis.link.shortener.model.LinkRequest;
 import com.denis.link.shortener.model.LinkResponse;
 import com.denis.link.shortener.repository.LinkRepository;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Service
-@AllArgsConstructor
 public class LinkService {
 
     private final LinkRepository linkRepository;
-    private final String BASE_URL = "http://localhost:9999/";
+    private final String BASE_URL;
+
+    public LinkService(LinkRepository linkRepository, @Value("${url.padrao}")  String BASE_URL) {
+        this.linkRepository = linkRepository;
+        this.BASE_URL = BASE_URL;
+    }
 
     public LinkResponse postLink(LinkRequest linkRequest, String customShortLink) {
         if (customShortLink == null){
@@ -36,6 +37,9 @@ public class LinkService {
             if (customShortLink.contains("/")) {
                 throw new CaracterInvalidoException();
             }
+        }
+        if (!validateLink(linkRequest)) {
+            throw new LinkInvalidoException(linkRequest.originalLink());
         }
         return toResponse(linkRepository.save(new LinkEntity(linkRequest.originalLink(), customShortLink)));
     }
@@ -73,5 +77,10 @@ public class LinkService {
                 BASE_URL+linkEntity.getShortLink(),
                 linkEntity.getCreatedAt()
         );
+    }
+
+    private boolean validateLink(LinkRequest linkRequest) {
+        UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_ALL_SCHEMES);
+        return urlValidator.isValid(linkRequest.originalLink());
     }
 }
